@@ -1,0 +1,90 @@
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Quickloc8',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Load the vehicle coordinates
+    List<LatLng> vehicleCoordinates = [];
+    for (var coordinate in vehicleCoordinatesJson) {
+      vehicleCoordinates.add(LatLng(coordinate['latitude'], coordinate['longitude']));
+    }
+
+    // Load the messages
+    List<String> messages = [];
+    for (var message in messagesJson) {
+      messages.add(message['message']);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Quickloc8'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Splash screen
+            SizedBox(
+              height: 300,
+              child: Image.asset('assets/quickloc8-logo.png'),
+            ),
+
+            // Map
+            SizedBox(
+              height: 400,
+              child: GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(-25.75813293457, 28.201217651367),
+                  zoom: 15,
+                ),
+                markers: vehicleCoordinates
+                    .map((coordinate) => Marker(
+                      position: coordinate,
+                      icon: BitmapDescriptor.defaultMarkerWithRotation(
+                        coordinate.bearing,
+                      ),
+                    ))
+                    .toList(),
+              ),
+            ),
+
+            // Messages
+            SizedBox(
+              height: 200,
+              child: ListView.builder(
+                itemBuilder: (context, index) => Text(messages[index]),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
